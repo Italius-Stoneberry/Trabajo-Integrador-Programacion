@@ -4,6 +4,7 @@ import Funciones_
 ruta_archivo="Paises_data.csv"
 paises=Funciones_.cargar_datos(ruta_archivo)
 print("Ingresar datos:")
+
 while True:
     Pais_Nombre=Funciones_.validar_Nombre("Ingrese el nombre del pais: ")
     Existencia=Funciones_.validar_existencia(Pais_Nombre,paises)

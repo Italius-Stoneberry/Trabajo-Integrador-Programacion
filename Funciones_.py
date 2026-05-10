@@ -3,8 +3,8 @@ import os
 def cargar_datos(Paises_data):
     try:
         if os.path.exists(Paises_data):
-            with open(Paises_data,"r", encoding="utf-8") as Archivo:
-                lector=csv.DictReader(Archivo)
+            with open(Paises_data,"r", encoding="utf-8-sig") as Archivo:
+                lector=csv.DictReader(Archivo,delimiter=";")
                 return list(lector) #retorna la lista de diccionarios.
         else:
             print("El archivo no fue encontrado, estamos creando una lista vacía para que puedas trabajar.")
@@ -14,6 +14,8 @@ def cargar_datos(Paises_data):
         return None
     except Exception as Error:
         print(f"OCURRIÓ UN ERROR INESPERADO: {Error}")
+
+
 def guardar_cambios(Paises_data, lista_pasies_info):
     #La lista_paises_info, es la lista que nos retorna la función cargar_datos, que es guardada en una variable en el main
     if not lista_pasies_info:
@@ -42,6 +44,8 @@ class Longitud_Error(Exception):
     pass
 class Error_de_Cantidad(Exception):
     pass
+
+
 def validar_Nombre(mensaje):
     while True:
         try:
