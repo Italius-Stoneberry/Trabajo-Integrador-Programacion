@@ -1,13 +1,32 @@
 import csv
 import os
 ruta_global_archivo="Paises_data.csv"
+
+
 #Datos de prueba
 paises_lista=[ {"País": "Argentina", "Población": 45376763, "Superfície": 2780400, "Continente": "América"},
     {"País": "Japon", "Población": 125800000, "Superfície": 377975, "Continente": "Europa"}
 ]
+
+def mostrar_menu():
+    ancho=70
+    print("╔"+"═" *ancho+"╗")
+    print(f"║{' Hola bienvenido al gestor de paises ':^70}║")
+    print("╠"+"═" *ancho+"╣")
+    print(f"║{' [1] Agregar pais':<70}║")
+    print(f"║{' [2] Listar paises':<70}║")
+    print(f"║{' [3] Buscar pais':<70}║")
+    print(f"║{' [4] Modificar pais':<70}║")
+    print(f"║{' [5] Eliminar':<70}║")
+    print("╠"+"═" * ancho + "╣")
+    print(f"║{' [6] Salir':<70}║")
+    print("╚"+"═" * ancho + "╝")
+
+
+
 def cargar_datos(Paises_data):
-    global paises_lista, ruta_archivo
-    ruta_archivo=Paises_data
+    global paises_lista, ruta_global_archivo
+    ruta_global_archivo=Paises_data
     try:
         if os.path.exists(Paises_data):
             with open(Paises_data,"r", encoding="utf-8-sig") as Archivo:
@@ -31,7 +50,7 @@ def guardar_cambios():
         return False
     Encabezados_Claves=["País","Población","Superfície","Continente"]
     try:
-        with open(ruta_archivo,"w", newline="", encoding="utf-8-sig") as Archivo_Escritura:
+        with open(ruta_global_archivo,"w", newline="", encoding="utf-8-sig") as Archivo_Escritura:
             #se crea el escritor que actua como un puente entre los datos de la RAM y el Archivo_Escritura
             escritor=csv.DictWriter(Archivo_Escritura,fieldnames=Encabezados_Claves,delimiter=';')
             #se escribe la primera fila en el Archivo_Escritura, la cual representa los encabezados de las columnas
@@ -142,3 +161,68 @@ def validar_existencia(Pais,paises_lista):
         if pais["País"]==Pais:
             return True #retorna True solo si existe
     return False #Acá nos va a retornar falses solo si no existe
+
+
+def listar_pais():
+    #creamos dos listitas
+
+    print("╔"+"═" *16+"╦"+"═" *18+"╦"+"═" *17+"╦"+"═" *16+"╗")
+    print(f"║{' País ':^16}║{'Población':^18}║{'Superfície':^17}║{'Continente':^16}║")
+
+    if len(paises_lista) == 0:
+        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
+        print(f"║{"No hay paises cargados":^70}║")
+        print("╠"+"═" *70+"╣")
+
+    else:
+        print("╠"+"═" *16+"╬"+"═" *18+"╬"+"═" *17+"╬"+"═" *16+"╣")
+        for i in range(len(paises_lista)):
+            print(f"║{paises_lista[i]["País"].title():^16}║{paises_lista[i]["Población"]:^18}║{paises_lista[i]["Superfície"]:^17}║{paises_lista[i]["Continente"].title():^16}║")
+        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
+
+    print(f"║{"Oprima ENTER para continuar":^70}║")
+    print("╚"+"═"*70+"╝")
+    confirm=input("")
+    confirm=""
+
+
+def buscar_pais(lista_paises):
+    #creamos dos listitas
+    busqueda=[]
+    indice=0
+    seek=input("Que pais estas buscando?\n").lower()
+
+    for pais in lista_paises:
+            nombre_pais = pais["País"].lower()
+
+            if nombre_pais.startswith(seek):
+                busqueda.append([pais["País"],pais["Población"],pais["Superfície"],pais["Continente"]])
+
+
+    print("╔"+"═" *16+"╦"+"═" *18+"╦"+"═" *17+"╦"+"═" *16+"╗")
+    print(f"║{' Pais ':^16}║{'Poblacion':^18}║{'Superficie':^17}║{'Continente':^16}║")
+
+    if len(busqueda) == 0:
+        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
+        print(f"║{"No se encotraron paises con ese nombre":^70}║")
+        print("╠"+"═" *70+"╣")
+
+    else:
+        print("╠"+"═" *16+"╬"+"═" *18+"╬"+"═" *17+"╬"+"═" *16+"╣")
+        for i in range(len(busqueda)):
+            print(f"║{busqueda[i][0].title():^16}║{busqueda[i][1]:^18}║{busqueda[i][2]:^17}║{busqueda[i][3].title():^16}║")
+        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
+
+        
+    print(f"║{"Oprima ENTER para continuar":^70}║")
+    print("╚"+"═"*70+"╝")
+    confirm=input("")
+    confirm=""
+#________________________
+#parte de joaquin
+
+
+#________________________
+#parte de italo
+
+
