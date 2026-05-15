@@ -1,36 +1,43 @@
 import csv
 import os
-
+ruta_global_archivo="Paises_data.csv"
+#Datos de prueba
+paises_lista=[ {"País": "Argentina", "Población": 45376763, "Superfície": 2780400, "Continente": "América"},
+    {"País": "Japon", "Población": 125800000, "Superfície": 377975, "Continente": "Europa"}
+]
 def cargar_datos(Paises_data):
+    global paises_lista, ruta_archivo
+    ruta_archivo=Paises_data
     try:
         if os.path.exists(Paises_data):
             with open(Paises_data,"r", encoding="utf-8-sig") as Archivo:
                 lector=csv.DictReader(Archivo,delimiter=";")
-                return list(lector) #retorna la lista de diccionarios.
+                paises_lista=list(lector)
+                return paises_lista #retorna la lista de diccionarios.
         else:
             print("El archivo no fue encontrado, estamos creando una lista vacía para que puedas trabajar.")
             return[]
     except PermissionError:
         print("El archivo esta abierto en otro programa, cierrelo. O no tienes el permiso para usarlo.\nEn ambos casos intente nuevamente")
-        return None
+        return []
     except Exception as Error:
         print(f"OCURRIÓ UN ERROR INESPERADO: {Error}")
 
 
-def guardar_cambios(Paises_data, lista_pasies_info):
+def guardar_cambios():
     #La lista_paises_info, es la lista que nos retorna la función cargar_datos, que es guardada en una variable en el main
-    if not lista_pasies_info:
+    if not paises_lista:
         print("No hay datos en la lista, el archivo no se actualizará.")
         return False
     Encabezados_Claves=["País","Población","Superfície","Continente"]
     try:
-        with open(Paises_data,"w", newline="", encoding="utf-8-sig") as Archivo_Escritura:
+        with open(ruta_archivo,"w", newline="", encoding="utf-8-sig") as Archivo_Escritura:
             #se crea el escritor que actua como un puente entre los datos de la RAM y el Archivo_Escritura
             escritor=csv.DictWriter(Archivo_Escritura,fieldnames=Encabezados_Claves,delimiter=';')
             #se escribe la primera fila en el Archivo_Escritura, la cual representa los encabezados de las columnas
             escritor.writeheader()
             #se va a guardar cada valor contenido en el diccionario en la columna que le corresponde
-            escritor.writerows(lista_pasies_info)
+            escritor.writerows(paises_lista)
             return True
     except PermissionError:
         print("ERROR: El archivo esta abierto en otro programa, cierrelo e intente nuevamente.")
@@ -51,13 +58,11 @@ class Nombre_Error(Exception):
     pass
 
 
-
-
 def validar_Nombre(mensaje):
     while True:
         try:
             Nombre=input(mensaje).strip().capitalize()
-            if not Nombre.isalpha():
+            if not Nombre.replace(" ","").isalpha():
                 print("El nombre ingresado solo debe contener letras.")
                 continue
             elif len(Nombre)<=1:
@@ -68,6 +73,7 @@ def validar_Nombre(mensaje):
             print(F"ERROR: {e}")
             continue
 def validar_numero(mensaje_1,mensaje_2, Conjunto_numerico=int):
+    tipo='Entero' if Conjunto_numerico==int else 'Decimal'
     while True:
         try:
             Numero=Conjunto_numerico(input(mensaje_1))
@@ -76,7 +82,7 @@ def validar_numero(mensaje_1,mensaje_2, Conjunto_numerico=int):
             else:
                 return Numero
         except TypeError:
-            tipo='Entero' if Conjunto_numerico==int else 'Decimal'
+            
             print(f"Error: Debe ingresar un número de tipo {tipo}. Intente nuevamente")
             continue
         except ValueError:
@@ -87,11 +93,13 @@ def validar_numero(mensaje_1,mensaje_2, Conjunto_numerico=int):
             continue
 #def validar_decimal(mensaje_1,mensaje_2):
 #Estoy rehaciendo la función de agregar paises para evitar repeticiones
-def agregar_paises(lista_info_paises):
+def agregar_paises():
+    global paises_lista
     while True:
         try:
             Pais_Nuevo= validar_Nombre("Ingrese el Nombre del País a agregar: ")
-            if Pais_Nuevo not in lista_info_paises["País"]:
+            
+            if not validar_existencia(Pais_Nuevo,paises_lista):
                 Poblacion_Pais_Nuevo=validar_numero("Ingrese el número de población del nuevo país: ", "Población", int)
                 Superficie_Pais_Nuevo=validar_numero("Ingrese el número de superfície en km^2 para el nuevo país: ","Superfície", float)
                 Continete_Nuevo_Pais=validar_continente()
@@ -101,6 +109,11 @@ def agregar_paises(lista_info_paises):
                     "Superfície":Superficie_Pais_Nuevo,
                     "Continente":Continete_Nuevo_Pais
                 }
+                paises_lista.append(Pais_Nuevo_Dict)
+                if guardar_cambios():
+                    print(f"El país '{Pais_Nuevo}' y sus datos fueron guardados con éxito")
+                else: print("Se produjo un error al guardar los datos.")
+                break
                 
             else:  
                 raise Error_Repeticion("El país ya se encuentra registrado. Prube con otro.")
@@ -124,114 +137,8 @@ def validar_continente():
         except Nombre_Error as e:
             print(f"ERROR: {e}")   
             continue
-def validar_existencia(Pais, lista_info_paises):
-    if Pais not in lista_info_paises:
-        return True
-    else:
-        return False
-
-
-def mostrar_menu():
-    ancho=70
-    print("╔"+"═" *ancho+"╗")
-    print(f"║{' Hola bienvenido al gestor de paises ':^70}║")
-    print("╠"+"═" *ancho+"╣")
-    print(f"║{' [1] Agregar pais':<70}║")
-    print(f"║{' [2] Listar paises':<70}║")
-    print(f"║{' [3] Buscar pais':<70}║")
-    print(f"║{' [4] Modificar pais':<70}║")
-    print(f"║{' [5] Eliminar':<70}║")
-    print("╠"+"═" * ancho + "╣")
-    print(f"║{' [6] Salir':<70}║")
-    print("╚"+"═" * ancho + "╝")
-
-
-
-
-
-
-def cargar_pais(lista_paises,Paises_data):
-
-    while True:
-    
-        pais=validar_Nombre("Ingrese el nombre del pais: ")
-        Existencia=validar_existencia(pais,lista_paises)
-        if Existencia:
-            print("Nombre guardado correctamente")
-        else:
-            print("Este país ya existe en el archivo. Intente con otro.")
-        break
-    
-    Poblacion=validar_entero("Ingrese el número de población: ", "Población")
-    Superficie=validar_entero("Ingrese el número de superfície en km^2: ","Superfície")
-    Continente=validar_Nombre("Ingrese el nombre del Continente al que el país pertenece: ")
-    pais_diccionario={
-        "País": pais,
-        "Población":Poblacion,
-        "Superfície":Superficie,
-        "Continente":Continente
-    }
-    lista_paises.append(pais_diccionario)
-    if guardar_cambios(Paises_data, lista_paises):
-        print("Los datos se guardaron con éxito")
-    else:
-        print("Los datos no se guardaron, debido al error al momento de cargar")
-
-def listar_pais(lista_paises):
-    #creamos dos listitas
-
-    print("╔"+"═" *16+"╦"+"═" *18+"╦"+"═" *17+"╦"+"═" *16+"╗")
-    print(f"║{' País ':^16}║{'Población':^18}║{'Superfície':^17}║{'Continente':^16}║")
-
-    if len(lista_paises) == 0:
-        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
-        print(f"║{"No hay paises cargados":^70}║")
-        print("╠"+"═" *70+"╣")
-
-    else:
-        print("╠"+"═" *16+"╬"+"═" *18+"╬"+"═" *17+"╬"+"═" *16+"╣")
-        for i in range(len(lista_paises)):
-            print(f"║{lista_paises[i]["País"].title():^16}║{lista_paises[i]["Población"]:^18}║{lista_paises[i]["Superfície"]:^17}║{lista_paises[i]["Continente"].title():^16}║")
-        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
-
-    print(f"║{"Oprima ENTER para continuar":^70}║")
-    print("╚"+"═"*70+"╝")
-    confirm=input("")
-    confirm=""
-
-
-
-
-def buscar_pais(lista_paises):
-    #creamos dos listitas
-    busqueda=[]
-    indice=0
-    seek=input("Que pais estas buscando?\n").lower()
-
-    for pais in lista_paises:
-            nombre_pais = pais["País"].lower()
-
-            if nombre_pais.startswith(seek):
-                busqueda.append([pais["País"],pais["Población"],pais["Superfície"],pais["Continente"]])
-
-
-    print("╔"+"═" *16+"╦"+"═" *18+"╦"+"═" *17+"╦"+"═" *16+"╗")
-    print(f"║{' Pais ':^16}║{'Poblacion':^18}║{'Superficie':^17}║{'Continente':^16}║")
-
-    if len(busqueda) == 0:
-        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
-        print(f"║{"No se encotraron paises con ese nombre":^70}║")
-        print("╠"+"═" *70+"╣")
-
-    else:
-        print("╠"+"═" *16+"╬"+"═" *18+"╬"+"═" *17+"╬"+"═" *16+"╣")
-        for i in range(len(busqueda)):
-            print(f"║{busqueda[i][0].title():^16}║{busqueda[i][1]:^18}║{busqueda[i][2]:^17}║{busqueda[i][3].title():^16}║")
-        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
-
-        
-    print(f"║{"Oprima ENTER para continuar":^70}║")
-    print("╚"+"═"*70+"╝")
-    confirm=input("")
-    confirm=""
-
+def validar_existencia(Pais,paises_lista):
+    for pais in paises_lista:
+        if pais["País"]==Pais:
+            return True #retorna True solo si existe
+    return False #Acá nos va a retornar falses solo si no existe
