@@ -2,10 +2,18 @@ import csv
 import os
 import Funciones_de_prueba
 ruta_archivo="Paises_data.csv"
+<<<<<<< Updated upstream
 Funciones_de_prueba.cargar_datos("Paises_data.csv")
 
 
 '''while True:
+=======
+paises=Funciones_.cargar_datos(ruta_archivo)
+
+
+print("Ingresar datos:")
+while True:
+>>>>>>> Stashed changes
     Pais_Nombre=Funciones_.validar_Nombre("Ingrese el nombre del pais: ")
     Existencia=Funciones_.validar_existencia(Pais_Nombre,paises)
     if Existencia:
@@ -42,3 +50,7 @@ if  Funciones_de_prueba.guardar_cambios():
         print("Los datos se guardaron con éxito")
 else:
         print("Los datos no se guardaron, debido al error al momento de cargar")
+<<<<<<< Updated upstream
+=======
+    break
+>>>>>>> Stashed changes
