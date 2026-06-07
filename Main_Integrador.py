@@ -28,6 +28,8 @@ while True:
             fun.modificar_pais() 
         case '7':
             fun.ordenamiento() #BROO esta opción tenes que agregarla al menú
+        case '8':
+            fun.filtrar_paises()#BROO esta opción tambien hay que agregarla al menú
         case '6':
             break
         case _:

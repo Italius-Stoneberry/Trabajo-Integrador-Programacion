@@ -84,22 +84,24 @@ class Error_Repeticion(Exception):
     pass
 class nombre_Error(Exception):
     pass
-
+class Rango_Error(Exception):
+    pass
 
 def validar_nombre(mensaje):
     while True:
         try:
             nombre=input(mensaje).strip().capitalize()
-            if not nombre.replace(" ","").isalpha():
-                print("El nombre ingresado solo debe contener letras.")
-                continue
-            elif len(nombre)<=1:
+            if len(nombre)<=1:
                 raise Longitud_Error("El nombre ingresado debe tener como mínimo 2 caracteres.")
+            if not nombre.replace(" ","").isalpha():
+                raise nombre_Error("El nombre ingresado solo debe contener letras.")
             else:
                return str(nombre)
         except Longitud_Error as e:
             print(F"ERROR: {e}")
-            continue
+        
+        except nombre_Error as e:
+            print(f"ERROR:{e}")
 def validar_numero(mensaje_1,mensaje_2, Conjunto_numerico=int):
     tipo='Entero' if Conjunto_numerico==int else 'Decimal'
     while True:
@@ -153,11 +155,11 @@ def agregar_paises():
             continue
 
 
-def validar_continente():
+def validar_continente(mensaje="Ingrese el continente al cual pertence el país: "):
     continentes=["Europa","América","África","Asia","Oceanía","Antártida"]
     while True:
         try:
-            continente=validar_nombre("Ingrese el continente al cual pertence el país: ")
+            continente=validar_nombre(mensaje)
             if continente not in continentes:
                 raise nombre_Error("El nombre del continente ingresado es incorrecto, asegúrese de escribirlo bien.")
             else:
@@ -172,21 +174,22 @@ def validar_existencia(Pais,paises_lista):
     return False #Acá nos va a retornar falses solo si no existe
 
 
-def listar_pais():
-    #creamos dos listitas
-
+def listar_pais(lista=None):#le agregué ese parámetro para poder listar la info de los piases sea cual sea la lista
+    
+    if lista is None:
+        lista=paises_lista
     print("╔"+"═" *16+"╦"+"═" *18+"╦"+"═" *17+"╦"+"═" *16+"╗")
     print(f"║{' País ':^16}║{'población':^18}║{'superficie':^17}║{'continente':^16}║")
 
-    if len(paises_lista) == 0:
+    if len(lista) == 0:
         print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
         print(f"║{"No hay paises cargados":^70}║")
         print("╠"+"═" *70+"╣")
 
     else:
         print("╠"+"═" *16+"╬"+"═" *18+"╬"+"═" *17+"╬"+"═" *16+"╣")
-        for i in range(len(paises_lista)):
-            print(f"║{paises_lista[i]["nombre"].title():^16}║{paises_lista[i]["población"]:^18}║{paises_lista[i]["superficie"]:^17}║{paises_lista[i]["continente"].title():^16}║")
+        for i in range(len(lista)):
+            print(f"║{lista[i]["nombre"].title():^16}║{lista[i]["población"]:^18}║{lista[i]["superficie"]:^17}║{lista[i]["continente"].title():^16}║")
         print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
 
     print(f"║{"Oprima ENTER para continuar":^70}║")
@@ -195,14 +198,15 @@ def listar_pais():
     confirm=""
 
 
-def buscar_pais(): #modifique acá ya que no tiene que recibir paramestros, antes estaba así: def buscar_pais(lista_paises):
+def buscar_pais(): #modifique acá ya que no tiene que recibir parametros, antes estaba así: def buscar_pais(lista_paises):
     #creamos dos listitas
     busqueda=[]
     indice=0
-    seek=input("Que pais estas buscando?\n").lower()
+    #seek=input("Que pais estas buscando?\n").lower()
+    seek=validar_nombre("Que pais estas buscando?\n")
 
     for pais in paises_lista:
-            nombre_pais = pais["nombre"].lower()
+            nombre_pais = pais["nombre"].capitalize()#cambie lower por capitalize()
 
             if nombre_pais.startswith(seek):
                 busqueda.append([pais["nombre"],pais["población"],pais["superficie"],pais["continente"]])
@@ -229,19 +233,24 @@ def buscar_pais(): #modifique acá ya que no tiene que recibir paramestros, ante
     confirm=""
 #________________________
 #parte de joaquin
-def seleccion_criterio_ordenamiento():
+def validar_opcion(lista,mensaje):
+    while True:
+            op= input(mensaje).strip()
+            if op  in lista:
+                return op
+            else:
+                print("Intente Nuevamente")
+    
+def seleccion_criterio_ordenamiento():#bro esta parte si queres podes hcerle un men como al del main
     while True:
         print("CRITERIOS DE ORDENAMIENTO DE LOS PAISES:\n" \
         "1-nombre\n" \
         "2-población\n" \
         "3-superficie")
-        while True:
-            criterio= input("Ingrese el número del criterio por el cual desea ordenar los países: ").strip()
-            if criterio  in ["1","2","3"]:
-                break
-            else:
-                print("Intente Nuevamente")
-        match criterio  :
+        
+        criterio=validar_opcion(["1","2","3"],"Ingrese el número del criterio por el cual desea ordenar los países: ")
+            
+        match criterio:
             case"1":
                 criterio="nombre"
                 return criterio
@@ -256,12 +265,9 @@ def elección_orden():
         print("ORDEN DE LA VISUALIZACIÓN\n" \
         "1-Ascendente (Menor a Mayor / A-Z)\n "
         "2-Descendente (Mayor a Menor / Z-A)\n")
-        while True:
-            orden=input("Ingrese el número correspondiente al orden que desea: ").strip()
-            if orden in ["1","2"]:
-                break
-            else:
-                print("Intente Nuevamente")
+       
+        orden=validar_opcion(["1","2"],"Ingrese el número correspondiente al orden que desea: ")
+           
         match orden:
             case "1":
                 Ascendete= False
@@ -284,7 +290,52 @@ def mostrar_lista_ordenada(lista, criterio, Orden):
     print(f"Lista Ordenada bajo el criterio '{criterio}' de manera '{Ordenada}'")
     for pais in lista:
      print(f"País: {pais['nombre']:<15} | población: {pais['población']:<12} | superficie: {pais['superficie']} km²")   
+def filtrar_paises():
+    print("FILTRADO DE PAÍSES\n"
+    "[1]-POR CONTINENTE\n" \
+    "[2]-POR RANGO DE POBLACIÓN\n" \
+    "[3]-POR RANGO DE SUPERFÍCIE\n")
+    filtro=validar_opcion(["1","2","3"],"Seleccione una opción de filtrado (1,2,3): ")
+    match filtro:
+        case "1":
+            filtro_continentes()
+            return
+        case "2":
+            filtro_rango("Ingrese el valor mínimo de población: ",'población', int)
+            return
+        case "3":
+            filtro_rango("Ingrese el valor mínimo de superficie: ",'superficie', float)
+            return 
+def filtro_continentes():
+    filtrados=[]
+    continente=validar_continente("Ingrese el nombre del continente por el cual desea filtrar: ")
+
+    for dato in paises_lista:
+        if dato['continente']==continente:
+            filtrados.append(dato)
+    print("Filtrando países.........")
+    listar_pais(filtrados)
+def validar_rango(mensaje_1,clave,conjunto_numerico):
+    valor_minimo=validar_numero(mensaje_1,clave,conjunto_numerico)
+    while True:
+        try:
+            valor_maximo=validar_numero("Ingrese el valor máximo: ",clave,conjunto_numerico)
+            if valor_maximo>=valor_minimo:
+                return valor_minimo,valor_maximo
+            else:
+                raise Rango_Error("El valor máximo no puede ser menor al valor mínimo")
+        except Rango_Error as e:
+            print(f"ERROR: {e}")
+
+def filtro_rango(mensaje_1,clave,conjunto_numerico):
+    filtrados_rango=[]
+    minimo,maximo=validar_rango(mensaje_1,clave,conjunto_numerico)
+    for pais in paises_lista:
+        if minimo<=pais[clave]<=maximo:
+            filtrados_rango.append(pais)
+    listar_pais(filtrados_rango)
+    
 #________________________
-#parte de italo
+#parte de italo: bro soy jaoquin en la función mostrar menú entes que agregar las funciones que hice, en el mainagrege el case 7 donde uso la función de ordenamiento
 
 
