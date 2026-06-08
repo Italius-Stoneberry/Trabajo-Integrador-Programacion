@@ -4,6 +4,12 @@ import os
 carpeta_de_trabajo = os.path.dirname(os.path.abspath(__file__))
 ruta_global_archivo = os.path.join(carpeta_de_trabajo, "Paises_data.csv")
 
+def limpiar_pantalla():
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
+
 #Datos de prueba
 paises_lista=[ {"nombre": "Argentina", "población": 45376763, "superficie": 278040.0, "continente": "América"},
     {"nombre": "Japon", "población": 125800000, "superficie": 377975.0, "continente": "Europa"}
@@ -17,10 +23,11 @@ def mostrar_menu():
     print(f"║{' [1] Agregar pais':<70}║")
     print(f"║{' [2] Listar paises':<70}║")
     print(f"║{' [3] Buscar pais':<70}║")
-    print(f"║{' [4] Modificar pais':<70}║")
-    print(f"║{' [5] Eliminar':<70}║")
+    print(f"║{' [4] Ordenamiento':<70}║")
+    print(f"║{' [5] Filtros':<70}║")
+    print(f"║{' [6] Estadísticas':<70}║")
     print("╠"+"═" * ancho + "╣")
-    print(f"║{' [6] Salir':<70}║")
+    print(f"║{' [7] Salir':<70}║")
     print("╚"+"═" * ancho + "╝")
 
 
@@ -38,24 +45,34 @@ def cargar_datos():
                         pais["población"]=int(pais["población"])
                         pais["superficie"]=float(pais["superficie"])  
                     except (ValueError,KeyError,TypeError) as e:
-                        print(f"ERROR: {e}, el progrmama no se cerrara, el error será solucionado")
+                        print("╔"+"═" *80+"╗")
+                        print(f"║{'ERROR: {e}, el progrmama no se cerrara, el error será solucionado':^80} ║")
+                        print("╚"+"═" *80+"╝")
                         pais["población"] = 0
                         pais["superficie"] = 0.0
                 return paises_lista #retorna la lista de diccionarios.
         else:
-            print("El archivo no fue encontrado, estamos creando una lista vacía para que puedas trabajar.")
+            print("╔"+"═" *80+"╗")
+            print(f"║{'El archivo no fue encontrado, estamos creando una lista vacía para que puedas trabajar.':^80} ║")
+            print("╚"+"═" *80+"╝")
             return[]
     except PermissionError:
-        print("El archivo esta abierto en otro programa, cierrelo. O no tienes el permiso para usarlo.\nEn ambos casos intente nuevamente")
+        print("╔"+"═" *80+"╗")
+        print(f"║{'ERROR: El archivo esta abierto en otro programa, cierrelo. O no tienes el permiso para usarlo.':^80} ║")
+        print("╚"+"═" *80+"╝")
         return []
     except Exception as Error:
-        print(f"OCURRIÓ UN ERROR INESPERADO: {Error}")
+        print("╔"+"═" *80+"╗")
+        print(f"║{'OCURRIÓ UN ERROR INESPERADO: {Error}':^80} ║")
+        print("╚"+"═" *80+"╝")
 
 
 def guardar_cambios():
     #La lista_paises_info, es la lista que nos retorna la función cargar_datos, que es guardada en una variable en el main
     if not paises_lista:
-        print("No hay datos en la lista, el archivo no se actualizará.")
+        print("╔"+"═" *50+"╗")
+        print(f"║{'No hay datos en la lista, el archivo no se actualizará.':^50} ║")
+        print("╚"+"═" *50+"╝")
         return False
     Encabezados_Claves=["nombre","población","superficie","continente"]
     try:
@@ -68,13 +85,19 @@ def guardar_cambios():
             escritor.writerows(paises_lista)
             return True
     except PermissionError:
-        print("ERROR: El archivo esta abierto en otro programa, cierrelo e intente nuevamente.")
+        print("╔"+"═" *80+"╗")
+        print(f"║{'ERROR: El archivo esta abierto en otro programa, cierrelo e intente nuevamente.':^80} ║")
+        print("╚"+"═" *80+"╝")
         return False
     except KeyError:
-        print("ERROR: Algún elemento de tu archivo está incompleto 'FALTA UNA COLUMNA'")
+        print("╔"+"═" *80+"╗")
+        print(f"║{'ERROR: Algún elemento de tu archivo está incompleto, FALTA UNA COLUMNA':^80} ║")
+        print("╚"+"═" *80+"╝")
         return False
     except Exception as Error:
-        print(f"OCURRIÓ UN ERROR INESPERADO: Al querer guardadar datos: {Error}")
+        print("╔"+"═" *80+"╗")
+        print(f"║{'OCURRIÓ UN ERROR INESPERADO: Al querer guardadar datos: {Error}':^80} ║")
+        print("╚"+"═" *80+"╝")
         return False
 class Longitud_Error(Exception):
     pass
@@ -89,37 +112,62 @@ class Rango_Error(Exception):
 
 def validar_nombre(mensaje):
     while True:
+        
         try:
-            nombre=input(mensaje).strip().capitalize()
-            if len(nombre)<=1:
-                raise Longitud_Error("El nombre ingresado debe tener como mínimo 2 caracteres.")
+            
+            print("╔" + "═" * 80 + "╗")     
+            print(f"║{mensaje:<79} ║")
+            print("╚" + "═" * 80 + "╝")
+            nombre=input(f"\033[2A\033[{len(mensaje)+1}C").strip().capitalize()
+            print("\033[1B", end="")
+            if len(nombre)<=1 or nombre=="":
+                raise Longitud_Error(f"El nombre ingresado debe tener como mínimo 2 caracteres.")
             if not nombre.replace(" ","").isalpha():
-                raise nombre_Error("El nombre ingresado solo debe contener letras.")
+                raise nombre_Error(f"El nombre ingresado solo debe contener letras.")
             else:
                return str(nombre)
         except Longitud_Error as e:
-            print(F"ERROR: {e}")
+            limpiar_pantalla()
+            print("╔"+"═" *80+"╗")
+            print(f"║{f'ERROR: {e}':^79} ║")
+            print("╚"+"═" *80+"╝")
         
         except nombre_Error as e:
-            print(f"ERROR:{e}")
+            limpiar_pantalla()
+            print("╔"+"═" *80+"╗")
+            print(f"║{f'ERROR: {e}':^79} ║")
+            print("╚"+"═" *80+"╝")
+
 def validar_numero(mensaje_1,mensaje_2, Conjunto_numerico=int):
     tipo='Entero' if Conjunto_numerico==int else 'Decimal'
     while True:
         try:
-            Numero=Conjunto_numerico(input(mensaje_1))
+            print("╔"+"═" *80+"╗")
+            print(f"║{mensaje_1:<79} ║")
+            print("╚" + "═" * 80 + "╝")
+            Numero=Conjunto_numerico(input(f"\033[2A\033[{len(mensaje_1)+1}C").strip())
+            print("\033[1B", end="")
             if Numero<=0:
-                raise Error_de_Cantidad(f"Es probable que el número ingresado no sea acorde a la realidad de la {mensaje_2}.")
+                raise Error_de_Cantidad(f"El número ingresado no es acorde a la {mensaje_2}.")
             else:
                 return Numero
         except TypeError:
-            
-            print(f"Error: Debe ingresar un número de tipo {tipo}. Intente nuevamente")
+            limpiar_pantalla()
+            print("╔"+"═" *80+"╗")
+            print(f"║{f'Error: Debe ingresar un número de tipo {tipo}.':^79} ║")
+            print("╚"+"═" *80+"╝")
             continue
         except ValueError:
-             print(f"Error: Debe ingresar un número de tipo {tipo}. Intente nuevamente")
-             continue
+            limpiar_pantalla()
+            print("╔"+"═" *80+"╗")
+            print(f"║{f'Error: Debe ingresar un número de tipo {tipo}.':^79} ║")
+            print("╚"+"═" *80+"╝")
+            continue
         except Error_de_Cantidad as e:
-            print(f"ERROR:{e}\nIntente nuevamente.")
+            limpiar_pantalla()
+            print("╔"+"═" *80+"╗")
+            print(f"║{f'ERROR:{e}':^79} ║")
+            print("╚"+"═" *80+"╝")
             continue
 
 #Estoy rehaciendo la función de agregar paises para evitar repeticiones
@@ -148,7 +196,10 @@ def agregar_paises():
             else:  
                 raise Error_Repeticion("El país ya se encuentra registrado. Prube con otro.")
         except Error_Repeticion as e:
-            print(f"ERROR: {e}")
+            limpiar_pantalla()
+            print("╔" + "═" * 80 + "╗")
+            print(f"║{f'ERROR:{e}':^79} ║")
+            print("╚" + "═" * 80 + "╝")   
             continue
         except Exception as E:
             print(f"Ocurrió un error Inesperado: {E}")
@@ -161,11 +212,14 @@ def validar_continente(mensaje="Ingrese el continente al cual pertence el país:
         try:
             continente=validar_nombre(mensaje)
             if continente not in continentes:
-                raise nombre_Error("El nombre del continente ingresado es incorrecto, asegúrese de escribirlo bien.")
+                raise nombre_Error("El nombre del continente ingresado es incorrecto.")
             else:
                 return continente
         except nombre_Error as e:
-            print(f"ERROR: {e}")   
+            limpiar_pantalla()
+            print("╔" + "═" * 80 + "╗")
+            print(f"║{f'ERROR:{e}':^79} ║")
+            print("╚" + "═" * 80 + "╝")   
             continue
 def validar_existencia(Pais,paises_lista):
     for pais in paises_lista:
@@ -195,6 +249,7 @@ def listar_pais(lista=None):#le agregué ese parámetro para poder listar la inf
     print(f"║{"Oprima ENTER para continuar":^70}║")
     print("╚"+"═"*70+"╝")
     confirm=input("")
+    limpiar_pantalla()
     confirm=""
 
 
@@ -203,7 +258,8 @@ def buscar_pais(): #modifique acá ya que no tiene que recibir parametros, antes
     busqueda=[]
     indice=0
     #seek=input("Que pais estas buscando?\n").lower()
-    seek=validar_nombre("Que pais estas buscando?\n")
+    seek=validar_nombre("Que pais estas buscando? ")
+    limpiar_pantalla()
 
     for pais in paises_lista:
             nombre_pais = pais["nombre"].capitalize()#cambie lower por capitalize()
@@ -230,25 +286,38 @@ def buscar_pais(): #modifique acá ya que no tiene que recibir parametros, antes
     print(f"║{"Oprima ENTER para continuar":^70}║")
     print("╚"+"═"*70+"╝")
     confirm=input("")
+    limpiar_pantalla()
     confirm=""
-#________________________
-#parte de joaquin
+
+
+
 def validar_opcion(lista,mensaje):
     while True:
-            op= input(mensaje).strip()
-            if op  in lista:
-                return op
-            else:
-                print("Intente Nuevamente")
+        print("╔" + "═" * 70 + "╗")
+        print(f"║{mensaje:<69} ║")
+        print("╚" + "═" * 70 + "╝")
+        op= input(f"\033[2A\033[{len(mensaje)+1}C").strip()
+        print("\033[1B", end="")
+        if op  in lista:
+            return op
+        else:
+            print("╔" + "═" * 70 + "╗")
+            print(f"║{'Intente Nuevamente':^69} ║")
+            print("╚" + "═" * 70 + "╝")
     
-def seleccion_criterio_ordenamiento():#bro esta parte si queres podes hcerle un men como al del main
+
+
+def seleccion_criterio_ordenamiento():
     while True:
-        print("CRITERIOS DE ORDENAMIENTO DE LOS PAISES:\n" \
-        "1-nombre\n" \
-        "2-población\n" \
-        "3-superficie")
+        print("╔"+"═" *70+"╗")
+        print(f"║{' CRITERIOS DE ORDENAMIENTO DE LOS PAISES ':^70}║")
+        print("╠"+"═" *70+"╣")
+        print(f"║{'[1] Nombre':^70}║")
+        print(f"║{'[2] Población':^70}║")
+        print(f"║{'[3] Superficie':^70}║")
+        print("╚"+"═" *70+"╝")
         
-        criterio=validar_opcion(["1","2","3"],"Ingrese el número del criterio por el cual desea ordenar los países: ")
+        criterio=validar_opcion(["1","2","3"],"Ordenar países por (ingrese número): ")
             
         match criterio:
             case"1":
@@ -260,13 +329,19 @@ def seleccion_criterio_ordenamiento():#bro esta parte si queres podes hcerle un 
             case "3":
                 criterio="superficie"
                 return criterio
+
+
+
 def elección_orden():
+    limpiar_pantalla()
     while True:
-        print("ORDEN DE LA VISUALIZACIÓN\n" \
-        "1-Ascendente (Menor a Mayor / A-Z)\n "
-        "2-Descendente (Mayor a Menor / Z-A)\n")
-       
-        orden=validar_opcion(["1","2"],"Ingrese el número correspondiente al orden que desea: ")
+        print("╔" + "═" * 70 + "╗")
+        print(f"║{'ORDEN DE LA VISUALIZACIÓN':^69} ║")
+        print("╠" + "═" * 70 + "╣")
+        print(f"║{'[1] Ascendente (Menor a Mayor / A-Z)':^69} ║")
+        print(f"║{'[2] Descendente (Mayor a Menor / Z-A)':^69} ║")
+        print("╚" + "═" * 70 + "╝")
+        orden=validar_opcion(["1","2"],"Seleccione el orden en el que desea ordenar la lista: ")
            
         match orden:
             case "1":
@@ -279,22 +354,41 @@ def elección_orden():
 
 def ordenamiento():
     global paises_lista
-    print("Ordenar Países")
     Criterio=seleccion_criterio_ordenamiento()
     Orden=elección_orden()
     lista_Ordenada=sorted(paises_lista, key=lambda x: x[Criterio], reverse=Orden)
     mostrar_lista_ordenada(lista_Ordenada,Criterio,Orden)
 
+
 def mostrar_lista_ordenada(lista, criterio, Orden):
-    Ordenada= "Ascendente" if Orden== False else  "Descendente"
-    print(f"Lista Ordenada bajo el criterio '{criterio}' de manera '{Ordenada}'")
+    limpiar_pantalla()
+    if Orden== False :
+        Ordenada= "Ascendente" 
+    else:
+        Ordenada= "Descendente"
+    print("╔" + "═" * 70 + "╗")
+    print(f"║{'LISTA ORDENADA BAJO EL CRITERIO ' + criterio + ' DE MANERA ' + Ordenada:^69} ║")
+    print("╠"+"═" *16+"╦"+"═" *17+"╦"+"═" *17+"╦"+"═" *17+"╣")
+    print(f"║{'País':^15} ║ {'población':^15} ║ {'superficie':^15} ║ {'continente':^15} ║")
+    print("╠"+"═" *16+"╬"+"═" *17+"╬"+"═" *17+"╬"+"═" *17+"╣")
     for pais in lista:
-     print(f"País: {pais['nombre']:<15} | población: {pais['población']:<12} | superficie: {pais['superficie']} km²")   
+     print(f"║{pais['nombre'].capitalize():^15} ║ {pais['población']:^15} ║ {pais['superficie']:^15} ║ {pais['continente'].capitalize():^15} ║")   
+    print("╠"+"═" *16+"╩"+"═" *17+"╩"+"═" *17+"╩"+"═" *17+"╣")
+    print(f"║{'Presione ENTER para continuar':^69} ║")
+    print("╚" + "═" * 70 + "╝")
+    confirm=input("")
+    limpiar_pantalla()
+
+
 def filtrar_paises():
-    print("FILTRADO DE PAÍSES\n"
-    "[1]-POR CONTINENTE\n" \
-    "[2]-POR RANGO DE POBLACIÓN\n" \
-    "[3]-POR RANGO DE SUPERFÍCIE\n")
+    limpiar_pantalla()
+    print("╔" + "═" * 70 + "╗")
+    print(f"║{'FILTRADO DE PAÍSES':^69} ║")
+    print("╠" + "═" * 70 + "╣")
+    print(f"║{'[1]-POR CONTINENTE':^69} ║")
+    print(f"║{'[2]-POR RANGO DE POBLACIÓN':^69} ║")
+    print(f"║{'[3]-POR RANGO DE SUPERFÍCIE':^69} ║")
+    print("╚" + "═" * 70 + "╝")
     filtro=validar_opcion(["1","2","3"],"Seleccione una opción de filtrado (1,2,3): ")
     match filtro:
         case "1":
@@ -306,15 +400,20 @@ def filtrar_paises():
         case "3":
             filtro_rango("Ingrese el valor mínimo de superficie: ",'superficie', float)
             return 
+
+
+
 def filtro_continentes():
     filtrados=[]
-    continente=validar_continente("Ingrese el nombre del continente por el cual desea filtrar: ")
-
+    limpiar_pantalla()
+    continente=validar_continente("Continente por el cual desea filtrar: ")
     for dato in paises_lista:
         if dato['continente']==continente:
             filtrados.append(dato)
-    print("Filtrando países.........")
     listar_pais(filtrados)
+
+
+
 def validar_rango(mensaje_1,clave,conjunto_numerico):
     valor_minimo=validar_numero(mensaje_1,clave,conjunto_numerico)
     while True:
@@ -327,6 +426,11 @@ def validar_rango(mensaje_1,clave,conjunto_numerico):
         except Rango_Error as e:
             print(f"ERROR: {e}")
 
+
+
+
+
+
 def filtro_rango(mensaje_1,clave,conjunto_numerico):
     filtrados_rango=[]
     minimo,maximo=validar_rango(mensaje_1,clave,conjunto_numerico)
@@ -335,7 +439,47 @@ def filtro_rango(mensaje_1,clave,conjunto_numerico):
             filtrados_rango.append(pais)
     listar_pais(filtrados_rango)
     
-#________________________
-#parte de italo: bro soy jaoquin en la función mostrar menú entes que agregar las funciones que hice, en el mainagrege el case 7 donde uso la función de ordenamiento
+
+def estadistica():
+    continentes=["Europa","América","África","Asia","Oceanía"]
+    print("╔"+"═" *80+"╗")
+    print(f"║{' ESTADÍSTICAS DE LOS PAÍSES (cargados)':^79} ║")
+    print("╠"+"═" *80+"╣")
+    
+    
+    pais_mayor = max(paises_lista, key=lambda x: x['población'])
+    pais_menor = min(paises_lista, key=lambda x: x['población'])
+    promedio_poblacion=sum(map(lambda x:x['población'], paises_lista))/len(paises_lista)
+    promedio_superficie=sum(map(lambda x:x['superficie'], paises_lista))/len(paises_lista)
+
+    
+    texto_mayor = f"País con mayor población: {pais_mayor['nombre']} con {pais_mayor['población']}"
+    texto_menor = f"País con menor población: {pais_menor['nombre']} con {pais_menor['población']}"
+    texto_promedio_poblacion=f"El promedio de poblacion de todos los paises es de: {promedio_poblacion: .0f} personas"
+    texto_promedio_superficie=f"El promedio de superficie de todos los paises es de: {promedio_superficie: .2f} km²"
+    
+    print(f"║{texto_mayor:<80}║")
+    print(f"║{texto_menor:<80}║")
+    print(f"║{texto_promedio_poblacion:<80}║")
+    print(f"║{texto_promedio_superficie:<80}║")
+    print("╚"+"═" *80+"╝")
+    print("")
 
 
+    print("╔" + "═" * 80 + "╗")
+    print(f"║{' CANTIDAD DE PAÍSES POR CONTINENTE':^80}║")
+    print("╠" + "═" * 80 + "╣")
+    
+    for continente in continentes:
+        # 1. Calculamos la cantidad (es tu misma línea, pero guardada en una variable)
+        cantidad = len(list(filter(lambda x: x['continente'] == continente, paises_lista)))
+        
+        # 2. Armamos el texto limpio
+        texto = f" La cantidad de Paises de {continente.capitalize()} en la lista es de: {cantidad}"
+        
+        # 3. Lo imprimimos forzando a que ocupe 80 espacios hacia la izquierda (<80)
+        print(f"║{texto:<80}║")
+        
+    print("╚" + "═" * 80 + "╝")
+    print("\nOprima ENTER para continuar")
+    input("")

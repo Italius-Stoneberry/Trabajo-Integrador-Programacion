@@ -15,22 +15,26 @@ while True:
     
     match(opcion):
         case '1':
-            # #paises = fun.agregar_paises() /ya no hace falta que esté igualada a la fación por que todo ocurre en el módulo de funciones            fun.agregar_paises()
-       
+            fun.limpiar_pantalla()
             fun.agregar_paises()
+            
         case '2':
+            fun.limpiar_pantalla()
             fun.listar_pais()            
         case '3':
+            fun.limpiar_pantalla()
             fun.buscar_pais()
         case '4':
-            fun.eliminar_pais()
-        case '5':
-            fun.modificar_pais() 
-        case '7':
+            fun.limpiar_pantalla()
             fun.ordenamiento() #BROO esta opción tenes que agregarla al menú
-        case '8':
+        case '5':
+            fun.limpiar_pantalla()
             fun.filtrar_paises()#BROO esta opción tambien hay que agregarla al menú
         case '6':
-            break
+            fun.limpiar_pantalla()
+            fun.estadistica()
+        case '7':
+            break   
         case _:
+            fun.limpiar_pantalla()
             print("Opción inválida.")

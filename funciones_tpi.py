@@ -131,3 +131,129 @@ def eliminar_pais(paises):
             print('Pais no encontrado.')
     
     return paises
+
+import os
+import sys
+import time
+import threading
+
+# Habilitar códigos ANSI en Windows
+if os.name == 'nt':
+    os.system("")
+
+# Evento global para controlar el hilo de forma segura
+evento_detener = threading.Event()
+
+def animar_area_superpuesta():
+    ancho = 70
+    
+    patron_base = [
+        "~~~~...~~~#####~~~...~~~~",
+        "~~...::########:::..~~~~~",
+        "~..:::::#####:::::..~~~~~",
+        "~~..::::####::::..~~~~...",
+        "~~~~...:###:...~~~~~.....",
+        "~~~~~~..##..~~~~~~~~~~~.."
+    ]
+    patron_mapa = [linea * 3 for linea in patron_base]
+    
+    mascara = [
+        ("      .·~", 12, "~·.      "),
+        ("   /  ",    18, "  \\   "), 
+        (" |  ",      22, "  | "),
+        (" |  ",      22, "  | "),
+        ("   \\  ",    18, "  /   "), 
+        ("      '·_", 12, "_·'      ")
+    ]
+    
+    opciones = [
+        " [1] Agregar pais",
+        " [2] Listar paises",
+        " [3] Buscar pais",
+        " [4] Ordenamiento",
+        " [5] Filtros",
+        " [6] Estadísticas"
+    ]
+
+    frame = 0
+    
+    while not evento_detener.is_set():
+        # 1. MAGIA ANSI: \033[s GUARDA la posición actual del cursor (donde está el input)
+        sys.stdout.write("\033[s")
+        
+        # 2. Mueve el cursor a la fila 1, columna 1 para redibujar el menú arriba
+        sys.stdout.write("\033[1;1H")
+        
+        # Armamos el menú entero en un string
+        buffer = ""
+        buffer += "╔" + "═" * ancho + "╗\n"
+        buffer += f"║{' Hola bienvenido al gestor de paises ':^70}║\n"
+        buffer += "╠" + "═" * ancho + "╣\n"
+
+        for i in range(6):
+            texto_opcion = opciones[i]
+            prefijo, ancho_movil, sufijo = mascara[i]
+            mapa_linea = patron_mapa[i]
+            
+            idx = frame % 25
+            porcion_movil = mapa_linea[idx : idx + ancho_movil]
+            
+            globo_str = f"{prefijo}{porcion_movil}{sufijo}"
+            espacio_medio = ancho - len(texto_opcion) - len(globo_str)
+            
+            buffer += f"║{texto_opcion}{' ' * espacio_medio}{globo_str}║\n"
+
+        buffer += "╠" + "═" * ancho + "╣\n"
+        buffer += f"║{' [7] Salir':<70}║\n"
+        buffer += "╚" + "═" * ancho + "╝\n"
+        
+        # 3. MAGIA ANSI: \033[u RESTAURA el cursor al lado de tu input
+        buffer += "\033[u"
+        
+        # Imprimimos y forzamos la salida
+        sys.stdout.write(buffer)
+        sys.stdout.flush()
+        
+        frame += 1
+        time.sleep(0.15)
+
+def iniciar_programa():
+    # Limpieza inicial única
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
+    while True:
+        # Preparamos la terminal y arrancamos la animación de fondo
+        evento_detener.clear()
+        sys.stdout.write("\033[1;1H") # Cursor arriba
+        hilo = threading.Thread(target=animar_area_superpuesta, daemon=True)
+        hilo.start()
+        
+        # Nos aseguramos de poner el input estático en la línea 13 (debajo del menú)
+        sys.stdout.write("\033[13;1H")
+        sys.stdout.write(" " * 50 + "\r") # Limpiamos la línea por si quedó texto viejo
+        
+        # TU INPUT NORMAL. El programa frena acá, pero el menú sigue moviéndose arriba.
+        opcion = input("Seleccione una opción: ")
+        
+        # Detenemos la animación y esperamos que el hilo cierre limpio
+        evento_detener.set()
+        hilo.join()
+        
+        # Lógica de tu programa
+        if opcion == '7':
+            print("\nSaliendo...")
+            break
+        elif opcion in ['1', '2', '3', '4', '5', '6']:
+            # Limpiamos la pantalla para mostrar la acción seleccionada
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print(f"Elegiste la opción {opcion}. Ejecutando lógica...\n")
+            
+            # Simulamos que tu programa hace algo y luego vuelve al menú
+            time.sleep(1.5)
+            os.system('cls' if os.name == 'nt' else 'clear')
+        else:
+            sys.stdout.write("\033[14;1HOpción inválida. ")
+            time.sleep(1)
+
+if __name__ == "__main__":
+    iniciar_programa()
