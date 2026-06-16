@@ -9,11 +9,7 @@ def limpiar_pantalla():
         os.system('cls')
     else:
         os.system('clear')
-
-#Datos de prueba
-paises_lista=[ {"nombre": "Argentina", "población": 45376763, "superficie": 278040.0, "continente": "América"},
-    {"nombre": "Japon", "población": 125800000, "superficie": 377975.0, "continente": "Europa"}
-]
+paises_lista = []
 
 def mostrar_menu():
     ancho=70
@@ -31,25 +27,53 @@ def mostrar_menu():
     print("╚"+"═" * ancho + "╝")
 
 
-
+archivo_roto= False
+def mensaje_bloqueo_de_seguridad():
+    print("╔" + "═" * 80 + "╗")
+    print(f"║{' ERROR DE SISTEMA ':^80}║")
+    print("╠" + "═" * 80 + "╣")
+    print(f"║{'No es posible acceder y/o procesar el archivo CSV de forma segura.':^80}║")
+    print(f"║{'Revise nombre de las columnas o si el archivo está abierto en otro lado.':^80}║")
+    print(f"║{'evise y arrgele el CSV así puede operar con el.':^80}║")
+    print(f"║{'El guardado de datos se canceló para evitar perder información.':^80}║")
+    print("╚" + "═" * 80 + "╝")
 def cargar_datos():
-    global paises_lista, ruta_global_archivo
-    
+    global paises_lista, ruta_global_archivo, archivo_roto
+    paises_lista=[]
     try:
         if os.path.exists(ruta_global_archivo):
+            
+            errores_encontrados=0
             with open(ruta_global_archivo,"r", encoding="utf-8-sig") as Archivo:
                 lector=csv.DictReader(Archivo,delimiter=";")
+                
+                columnas_esperadas = {"nombre", "población", "superficie", "continente"}
+
+                #commparo si las columnas del CSV existen y contienen por lo menos las neecerias
+                if lector.fieldnames is None or not columnas_esperadas.issubset(lector.fieldnames):
+                 archivo_roto = True
+                 print("╔"+"═" *80+"╗")
+                 print(f"║{'ERROR CRÍTICO: Las columnas del CSV fueron modificadas o eliminadas.':^80}║")
+                 print(f"║{'Se bloqueará el guardado de datos para evitar que pierda su información.':^80}║")
+                 print("╚"+"═" *80+"╝")
+                 return []
                 paises_lista=list(lector)
                 for pais in paises_lista:
                     try:
                         pais["población"]=int(pais["población"])
                         pais["superficie"]=float(pais["superficie"])  
-                    except (ValueError,KeyError,TypeError) as e:
-                        print("╔"+"═" *80+"╗")
-                        print(f"║{'ERROR: {e}, el progrmama no se cerrara, el error será solucionado':^80} ║")
-                        print("╚"+"═" *80+"╝")
+                    except (ValueError,TypeError):
+                        errores_encontrados+=1
                         pais["población"] = 0
                         pais["superficie"] = 0.0
+                if errores_encontrados>0 and not archivo_roto:
+                    print("╔"+"═" *80+"╗")
+                    print(f"║{'AVISO: Se encontraron errores en ' + str(errores_encontrados) + ' filas.':^80}║")
+                    print(f"║{'El error se produjo porque agregaron un valor no numérico desde el CSV.':^80}║")
+                    print(f"║{'Verifique en las casillas "población" y "superficie".':^80}║")
+                    print(f"║{'Dichas casillas tendran el valor nuérico "0".':^80}║")
+                    print("╚"+"═" *80+"╝")
+                    guardar_cambios()
                 return paises_lista #retorna la lista de diccionarios.
         else:
             print("╔"+"═" *80+"╗")
@@ -57,22 +81,40 @@ def cargar_datos():
             print("╚"+"═" *80+"╝")
             return[]
     except PermissionError:
+        archivo_roto=True
         print("╔"+"═" *80+"╗")
-        print(f"║{'ERROR: El archivo esta abierto en otro programa, cierrelo. O no tienes el permiso para usarlo.':^80} ║")
+        print(f"║{'ERROR: El archivo está abierto en otro programa, ciérrelo. O no tienes el permiso para usarlo.':^80} ║")
         print("╚"+"═" *80+"╝")
         return []
+    except KeyError as e:
+        limpiar_pantalla()
+        archivo_roto = True
+        print("╔" + "═" * 80 + "╗")
+        print(f"║{' ERROR EN LA ESTRUCTURA DEL ARCHIVO ':^80}║")
+        print("╠" + "═" * 80 + "╣")
+        print(f"║{'No se pudo leer la columna:':^80}║")
+        print(f"║{str(e):^80}║")
+        print(f"║{'El archivo CSV tiene un formato incompatible o está corrupto.':^80}║")
+        print(f"║{'Por favor, repare el archivo antes de continuar.':^80}║")
+        print("╚" + "═" * 80 + "╝")
+        return []
     except Exception as Error:
+        archivo_roto=True
         print("╔"+"═" *80+"╗")
-        print(f"║{'OCURRIÓ UN ERROR INESPERADO: {Error}':^80} ║")
+        print(f"║{f'OCURRIÓ UN ERROR INESPERADO: {Error}':^80} ║")
         print("╚"+"═" *80+"╝")
 
 
 def guardar_cambios():
     #La lista_paises_info, es la lista que nos retorna la función cargar_datos, que es guardada en una variable en el main
-    if not paises_lista:
+    '''if not paises_lista:
         print("╔"+"═" *50+"╗")
         print(f"║{'No hay datos en la lista, el archivo no se actualizará.':^50} ║")
         print("╚"+"═" *50+"╝")
+        return False'''
+    global archivo_roto
+    if archivo_roto:
+        mensaje_bloqueo_de_seguridad()
         return False
     Encabezados_Claves=["nombre","población","superficie","continente"]
     try:
@@ -86,7 +128,7 @@ def guardar_cambios():
             return True
     except PermissionError:
         print("╔"+"═" *80+"╗")
-        print(f"║{'ERROR: El archivo esta abierto en otro programa, cierrelo e intente nuevamente.':^80} ║")
+        print(f"║{'ERROR:El archivo esta abierto en otro programa, cierrelo e intente nuevamente.':^79} ║")
         print("╚"+"═" *80+"╝")
         return False
     except KeyError:
@@ -118,11 +160,11 @@ def validar_nombre(mensaje):
             print("╔" + "═" * 80 + "╗")     
             print(f"║{mensaje:<79} ║")
             print("╚" + "═" * 80 + "╝")
-            nombre=input(f"\033[2A\033[{len(mensaje)+1}C").strip().capitalize()
+            nombre=input(f"\033[2A\033[{len(mensaje)+1}C").strip().title()
             print("\033[1B", end="")
             if len(nombre)<=1 or nombre=="":
                 raise Longitud_Error(f"El nombre ingresado debe tener como mínimo 2 caracteres.")
-            if not nombre.replace(" ","").isalpha():
+            if not nombre.replace(" ","").replace("-","").isalpha():
                 raise nombre_Error(f"El nombre ingresado solo debe contener letras.")
             else:
                return str(nombre)
@@ -135,7 +177,7 @@ def validar_nombre(mensaje):
         except nombre_Error as e:
             limpiar_pantalla()
             print("╔"+"═" *80+"╗")
-            print(f"║{f'ERROR: {e}':^79} ║")
+            print(f"║{'ERROR: {e}':^79} ║")# tenia un "f" anidado dentro de las llaves, lo saqué
             print("╚"+"═" *80+"╝")
 
 def validar_numero(mensaje_1,mensaje_2, Conjunto_numerico=int):
@@ -180,21 +222,25 @@ def agregar_paises():
             if not validar_existencia(Pais_Nuevo,paises_lista):
                 Poblacion_Pais_Nuevo=validar_numero("Ingrese el número de población del nuevo país: ", "población", int)
                 superficie_Pais_Nuevo=validar_numero("Ingrese el número de superficie en km^2 para el nuevo país: ","superficie", float)
-                Continete_Nuevo_Pais=validar_continente()
+                Continente_Nuevo_Pais=validar_continente()
                 Pais_Nuevo_Dict={
                     "nombre":Pais_Nuevo,
                     "población":Poblacion_Pais_Nuevo,
                     "superficie":superficie_Pais_Nuevo,
-                    "continente":Continete_Nuevo_Pais
+                    "continente":Continente_Nuevo_Pais
                 }
                 paises_lista.append(Pais_Nuevo_Dict)
                 if guardar_cambios():
+                    limpiar_pantalla()
                     print(f"El país '{Pais_Nuevo}' y sus datos fueron guardados con éxito")
-                else: print("Se produjo un error al guardar los datos.")
+                else: 
+                    print("╔" + "═" * 80 + "╗")
+                    print(f"║{'Se produjo un error al guardar los datos.':^79} ║")
+                    print("╚" + "═" * 80 + "╝")
                 break
                 
             else:  
-                raise Error_Repeticion("El país ya se encuentra registrado. Prube con otro.")
+                raise Error_Repeticion("El país ya se encuentra registrado. Pruebe con otro.")
         except Error_Repeticion as e:
             limpiar_pantalla()
             print("╔" + "═" * 80 + "╗")
@@ -219,6 +265,7 @@ def validar_continente(mensaje="Ingrese el continente al cual pertence el país:
             limpiar_pantalla()
             print("╔" + "═" * 80 + "╗")
             print(f"║{f'ERROR:{e}':^79} ║")
+            print(f"║{'Recuerde respetar tildes y mayúsculas (Ej: América, África, Asia).':^79} ║")
             print("╚" + "═" * 80 + "╝")   
             continue
 def validar_existencia(Pais,paises_lista):
@@ -227,8 +274,29 @@ def validar_existencia(Pais,paises_lista):
             return True #retorna True solo si existe
     return False #Acá nos va a retornar falses solo si no existe
 
+def listar_pais(lista=None):
+    if lista is None:
+        lista = paises_lista
+        
+    print("╔"+"═" *16+"╦"+"═" *18+"╦"+"═" *17+"╦"+"═" *16+"╗")
+    print(f"║{' País ':^16}║{'población':^18}║{'superficie':^17}║{'continente':^16}║")
 
-def listar_pais(lista=None):#le agregué ese parámetro para poder listar la info de los piases sea cual sea la lista
+    if len(lista) == 0:
+        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
+        print(f"║{'No hay paises cargados':^70}║") 
+        print("╠"+"═" *70+"╣")
+
+    else:
+        print("╠"+"═" *16+"╬"+"═" *18+"╬"+"═" *17+"╬"+"═" *16+"╣")
+        for i in range(len(lista)):
+            print(f"║{lista[i]['nombre'][:15].title():^16}║{lista[i]['población']:^18}║{lista[i]['superficie']:^17}║{lista[i]['continente'][:15].title():^16}║") 
+        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
+
+    print(f"║{'Oprima ENTER para continuar':^70}║")
+    print("╚"+"═"*70+"╝")
+    input("")
+    limpiar_pantalla()
+'''def listar_pais(lista=None):#le agregué ese parámetro para poder listar la info de los paises sea cual sea la lista
     
     if lista is None:
         lista=paises_lista
@@ -243,26 +311,25 @@ def listar_pais(lista=None):#le agregué ese parámetro para poder listar la inf
     else:
         print("╠"+"═" *16+"╬"+"═" *18+"╬"+"═" *17+"╬"+"═" *16+"╣")
         for i in range(len(lista)):
-            print(f"║{lista[i]["nombre"].title():^16}║{lista[i]["población"]:^18}║{lista[i]["superficie"]:^17}║{lista[i]["continente"].title():^16}║")
+            print(f"║ {lista[i]['nombre'][:15].title():<15} ║ {lista[i]['población']:<15} ║ {lista[i]['superficie']:<15} ║ {lista[i]['continente'][:15].title():<15} ║") 
+            #print(f"║{lista[i]["nombre"].title():^16}║{lista[i]["población"]:^18}║{lista[i]["superficie"]:^17}║{lista[i]["continente"].title():^16}║") #arreglar visualización de la tabla, ya que si ingresamos nombre largo se corre todo.
         print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
 
     print(f"║{"Oprima ENTER para continuar":^70}║")
     print("╚"+"═"*70+"╝")
     confirm=input("")
     limpiar_pantalla()
-    confirm=""
+    confirm=""'''
 
 
 def buscar_pais(): #modifique acá ya que no tiene que recibir parametros, antes estaba así: def buscar_pais(lista_paises):
-    #creamos dos listitas
     busqueda=[]
-    indice=0
-    #seek=input("Que pais estas buscando?\n").lower()
-    seek=validar_nombre("Que pais estas buscando? ")
+    
+    seek=validar_nombre("¿Que país estas buscando?: ")
     limpiar_pantalla()
 
     for pais in paises_lista:
-            nombre_pais = pais["nombre"].capitalize()#cambie lower por capitalize()
+            nombre_pais = pais["nombre"].title()#cambie lower por capitalize()
 
             if nombre_pais.startswith(seek):
                 busqueda.append([pais["nombre"],pais["población"],pais["superficie"],pais["continente"]])
@@ -273,7 +340,7 @@ def buscar_pais(): #modifique acá ya que no tiene que recibir parametros, antes
 
     if len(busqueda) == 0:
         print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
-        print(f"║{"No se encotraron paises con ese nombre":^70}║")
+        print(f"║{'No se encotraron paises con ese nombre':^70}║")
         print("╠"+"═" *70+"╣")
 
     else:
@@ -345,8 +412,8 @@ def elección_orden():
            
         match orden:
             case "1":
-                Ascendete= False
-                return Ascendete
+                Ascendente= False
+                return Ascendente
             case "2":
                 Descendente=True
                 return Descendente
@@ -372,7 +439,7 @@ def mostrar_lista_ordenada(lista, criterio, Orden):
     print(f"║{'País':^15} ║ {'población':^15} ║ {'superficie':^15} ║ {'continente':^15} ║")
     print("╠"+"═" *16+"╬"+"═" *17+"╬"+"═" *17+"╬"+"═" *17+"╣")
     for pais in lista:
-     print(f"║{pais['nombre'].capitalize():^15} ║ {pais['población']:^15} ║ {pais['superficie']:^15} ║ {pais['continente'].capitalize():^15} ║")   
+     print(f"║{pais['nombre'].title():^15} ║ {pais['población']:^15} ║ {pais['superficie']:^15} ║ {pais['continente'].title():^15} ║")   
     print("╠"+"═" *16+"╩"+"═" *17+"╩"+"═" *17+"╩"+"═" *17+"╣")
     print(f"║{'Presione ENTER para continuar':^69} ║")
     print("╚" + "═" * 70 + "╝")
@@ -387,7 +454,7 @@ def filtrar_paises():
     print("╠" + "═" * 70 + "╣")
     print(f"║{'[1]-POR CONTINENTE':^69} ║")
     print(f"║{'[2]-POR RANGO DE POBLACIÓN':^69} ║")
-    print(f"║{'[3]-POR RANGO DE SUPERFÍCIE':^69} ║")
+    print(f"║{'[3]-POR RANGO DE SUPERFICIE':^69} ║")
     print("╚" + "═" * 70 + "╝")
     filtro=validar_opcion(["1","2","3"],"Seleccione una opción de filtrado (1,2,3): ")
     match filtro:
@@ -415,8 +482,9 @@ def filtro_continentes():
 
 
 def validar_rango(mensaje_1,clave,conjunto_numerico):
-    valor_minimo=validar_numero(mensaje_1,clave,conjunto_numerico)
+   
     while True:
+        valor_minimo=validar_numero(mensaje_1,clave,conjunto_numerico)
         try:
             valor_maximo=validar_numero("Ingrese el valor máximo: ",clave,conjunto_numerico)
             if valor_maximo>=valor_minimo:
@@ -424,7 +492,11 @@ def validar_rango(mensaje_1,clave,conjunto_numerico):
             else:
                 raise Rango_Error("El valor máximo no puede ser menor al valor mínimo")
         except Rango_Error as e:
-            print(f"ERROR: {e}")
+            limpiar_pantalla()
+            print("╔" + "═" * 80 + "╗")
+            print(f"║{f'ERROR: {e}':^79} ║")
+            print("╚" + "═" * 80 + "╝")
+            #le agre tu formato de menú bro
 
 
 
@@ -441,10 +513,11 @@ def filtro_rango(mensaje_1,clave,conjunto_numerico):
     
 
 def estadistica():
-    continentes=["Europa","América","África","Asia","Oceanía"]
+    continentes=["Europa","América","África","Asia","Oceanía","Antártida"]
     print("╔"+"═" *80+"╗")
     print(f"║{' ESTADÍSTICAS DE LOS PAÍSES (cargados)':^79} ║")
     print("╠"+"═" *80+"╣")
+    
     
     
     pais_mayor = max(paises_lista, key=lambda x: x['población'])
@@ -455,8 +528,8 @@ def estadistica():
     
     texto_mayor = f"País con mayor población: {pais_mayor['nombre']} con {pais_mayor['población']}"
     texto_menor = f"País con menor población: {pais_menor['nombre']} con {pais_menor['población']}"
-    texto_promedio_poblacion=f"El promedio de poblacion de todos los paises es de: {promedio_poblacion: .0f} personas"
-    texto_promedio_superficie=f"El promedio de superficie de todos los paises es de: {promedio_superficie: .2f} km²"
+    texto_promedio_poblacion=f"El promedio de poblacion de todos los paises es de: {promedio_poblacion:.0f} personas"
+    texto_promedio_superficie=f"El promedio de superficie de todos los paises es de: {promedio_superficie:.2f} km²"
     
     print(f"║{texto_mayor:<80}║")
     print(f"║{texto_menor:<80}║")
@@ -475,7 +548,7 @@ def estadistica():
         cantidad = len(list(filter(lambda x: x['continente'] == continente, paises_lista)))
         
         # 2. Armamos el texto limpio
-        texto = f" La cantidad de Paises de {continente.capitalize()} en la lista es de: {cantidad}"
+        texto = f" La cantidad de Paises de {continente.title()} en la lista es de: {cantidad}"
         
         # 3. Lo imprimimos forzando a que ocupe 80 espacios hacia la izquierda (<80)
         print(f"║{texto:<80}║")
