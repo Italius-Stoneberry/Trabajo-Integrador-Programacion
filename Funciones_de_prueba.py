@@ -50,6 +50,11 @@ def mensaje_bloqueo_de_seguridad():
     print(f"║{'evise y arrgele el CSV así puede operar con el.':^80}║")
     print(f"║{'El guardado de datos se canceló para evitar perder información.':^80}║")
     print("╚" + "═" * 80 + "╝")
+
+"""
+Funcion cargar_datos, no recibe parametro
+Carga los datos del archivo CSV a la lista de diccionarios.
+"""
 def cargar_datos():
     global paises_lista, ruta_global_archivo, archivo_roto
     paises_lista=[]
@@ -62,7 +67,7 @@ def cargar_datos():
                 
                 columnas_esperadas = {"nombre", "población", "superficie", "continente"}
 
-                #commparo si las columnas del CSV existen y contienen por lo menos las neecerias
+                
                 if lector.fieldnames is None or not columnas_esperadas.issubset(lector.fieldnames):
                  archivo_roto = True
                  print("╔"+"═" *80+"╗")
@@ -87,7 +92,7 @@ def cargar_datos():
                     print(f"║{'Dichas casillas tendran el valor nuérico "0".':^80}║")
                     print("╚"+"═" *80+"╝")
                     guardar_cambios()
-                return paises_lista #retorna la lista de diccionarios.
+                return paises_lista
         else:
             print("╔"+"═" *80+"╗")
             print(f"║{'El archivo no fue encontrado, estamos creando una lista vacía para que puedas trabajar.':^80} ║")
@@ -123,12 +128,6 @@ Funcion guardar_cambios, no recibe parametro
 Guarda los cambios en el archivo CSV.
 """
 def guardar_cambios():
-    #La lista_paises_info, es la lista que nos retorna la función cargar_datos, que es guardada en una variable en el main
-    '''if not paises_lista:
-        print("╔"+"═" *50+"╗")
-        print(f"║{'No hay datos en la lista, el archivo no se actualizará.':^50} ║")
-        print("╚"+"═" *50+"╝")
-        return False'''
     global archivo_roto
     if archivo_roto:
         mensaje_bloqueo_de_seguridad()
@@ -304,9 +303,8 @@ Verifica si el pais ya existe en la lista.
 def validar_existencia(Pais,paises_lista):
     for pais in paises_lista:
         if pais["nombre"]==Pais:
-            return True #retorna True solo si existe
-    return False #Acá nos va a retornar falses solo si no existe
-
+            return True 
+    return False
 
 """
 Funcion listar_pais, recibe como parametro una lista
@@ -598,13 +596,8 @@ def estadistica():
     print("╠" + "═" * 80 + "╣")
     
     for continente in continentes:
-        # 1. Calculamos la cantidad (es tu misma línea, pero guardada en una variable)
         cantidad = len(list(filter(lambda x: x['continente'] == continente, paises_lista)))
-        
-        # 2. Armamos el texto limpio
         texto = f" La cantidad de Paises de {continente.title()} en la lista es de: {cantidad}"
-        
-        # 3. Lo imprimimos forzando a que ocupe 80 espacios hacia la izquierda (<80)
         print(f"║{texto:<80}║")
         
     print("╚" + "═" * 80 + "╝")
