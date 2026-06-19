@@ -4,6 +4,10 @@ import os
 carpeta_de_trabajo = os.path.dirname(os.path.abspath(__file__))
 ruta_global_archivo = os.path.join(carpeta_de_trabajo, "Paises_data.csv")
 
+"""
+Funcion limpiar_pantalla, no recibe parametro
+Limpia la pantalla.
+"""
 def limpiar_pantalla():
     if os.name == 'nt':
         os.system('cls')
@@ -11,6 +15,10 @@ def limpiar_pantalla():
         os.system('clear')
 paises_lista = []
 
+"""
+Funcion mostrar_menu, no recibe parametro
+Muestra el menu de opciones.
+"""
 def mostrar_menu():
     ancho=70
     print("╔"+"═" *ancho+"╗")
@@ -28,6 +36,11 @@ def mostrar_menu():
 
 
 archivo_roto= False
+
+"""
+Funcion mensaje_bloqueo_de_seguridad, no recibe parametro
+Muestra un mensaje de error cuando el archivo esta corrupto o no se puede acceder a el.
+"""
 def mensaje_bloqueo_de_seguridad():
     print("╔" + "═" * 80 + "╗")
     print(f"║{' ERROR DE SISTEMA ':^80}║")
@@ -105,6 +118,10 @@ def cargar_datos():
         print("╚"+"═" *80+"╝")
 
 
+"""
+Funcion guardar_cambios, no recibe parametro
+Guarda los cambios en el archivo CSV.
+"""
 def guardar_cambios():
     #La lista_paises_info, es la lista que nos retorna la función cargar_datos, que es guardada en una variable en el main
     '''if not paises_lista:
@@ -151,7 +168,10 @@ class nombre_Error(Exception):
     pass
 class Rango_Error(Exception):
     pass
-
+"""
+Funcion validar_nombre, recibe como parametro un mensaje
+Solicita al usuario que ingrese un nombre y lo valida.
+"""
 def validar_nombre(mensaje):
     while True:
         
@@ -177,9 +197,12 @@ def validar_nombre(mensaje):
         except nombre_Error as e:
             limpiar_pantalla()
             print("╔"+"═" *80+"╗")
-            print(f"║{'ERROR: {e}':^79} ║")# tenia un "f" anidado dentro de las llaves, lo saqué
+            print(f"║{f'ERROR: {e}':^79} ║")
             print("╚"+"═" *80+"╝")
-
+"""
+Funcion validar_numero, recibe como parametro un mensaje, otro mensaje y un tipo numerico
+Solicita al usuario que ingrese un número, validandolo y retornandolo.
+"""
 def validar_numero(mensaje_1,mensaje_2, Conjunto_numerico=int):
     tipo='Entero' if Conjunto_numerico==int else 'Decimal'
     while True:
@@ -211,8 +234,10 @@ def validar_numero(mensaje_1,mensaje_2, Conjunto_numerico=int):
             print(f"║{f'ERROR:{e}':^79} ║")
             print("╚"+"═" *80+"╝")
             continue
-
-#Estoy rehaciendo la función de agregar paises para evitar repeticiones
+"""
+Funcion agregar_paises, no recibe parametro
+Solicita al usuario que ingrese un pais y sus datos, validandolos y guardandolos en la lista de paises.
+"""
 def agregar_paises():
     global paises_lista
     while True:
@@ -251,7 +276,10 @@ def agregar_paises():
             print(f"Ocurrió un error Inesperado: {E}")
             continue
 
-
+"""
+Funcion validar_continente, no recibe parametro
+Solicita al usuario que ingrese un continente y valida que sea correcto.
+"""
 def validar_continente(mensaje="Ingrese el continente al cual pertence el país: "):
     continentes=["Europa","América","África","Asia","Oceanía","Antártida"]
     while True:
@@ -268,12 +296,22 @@ def validar_continente(mensaje="Ingrese el continente al cual pertence el país:
             print(f"║{'Recuerde respetar tildes y mayúsculas (Ej: América, África, Asia).':^79} ║")
             print("╚" + "═" * 80 + "╝")   
             continue
+
+"""
+Funcion validar_existencia, recibe como parametro un pais y una lista
+Verifica si el pais ya existe en la lista.
+"""
 def validar_existencia(Pais,paises_lista):
     for pais in paises_lista:
         if pais["nombre"]==Pais:
             return True #retorna True solo si existe
     return False #Acá nos va a retornar falses solo si no existe
 
+
+"""
+Funcion listar_pais, recibe como parametro una lista
+Imprime la lista en pantalla con un formato determinado.
+"""
 def listar_pais(lista=None):
     if lista is None:
         lista = paises_lista
@@ -296,40 +334,20 @@ def listar_pais(lista=None):
     print("╚"+"═"*70+"╝")
     input("")
     limpiar_pantalla()
-'''def listar_pais(lista=None):#le agregué ese parámetro para poder listar la info de los paises sea cual sea la lista
-    
-    if lista is None:
-        lista=paises_lista
-    print("╔"+"═" *16+"╦"+"═" *18+"╦"+"═" *17+"╦"+"═" *16+"╗")
-    print(f"║{' País ':^16}║{'población':^18}║{'superficie':^17}║{'continente':^16}║")
-
-    if len(lista) == 0:
-        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
-        print(f"║{"No hay paises cargados":^70}║")
-        print("╠"+"═" *70+"╣")
-
-    else:
-        print("╠"+"═" *16+"╬"+"═" *18+"╬"+"═" *17+"╬"+"═" *16+"╣")
-        for i in range(len(lista)):
-            print(f"║ {lista[i]['nombre'][:15].title():<15} ║ {lista[i]['población']:<15} ║ {lista[i]['superficie']:<15} ║ {lista[i]['continente'][:15].title():<15} ║") 
-            #print(f"║{lista[i]["nombre"].title():^16}║{lista[i]["población"]:^18}║{lista[i]["superficie"]:^17}║{lista[i]["continente"].title():^16}║") #arreglar visualización de la tabla, ya que si ingresamos nombre largo se corre todo.
-        print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
-
-    print(f"║{"Oprima ENTER para continuar":^70}║")
-    print("╚"+"═"*70+"╝")
-    confirm=input("")
-    limpiar_pantalla()
-    confirm=""'''
 
 
-def buscar_pais(): #modifique acá ya que no tiene que recibir parametros, antes estaba así: def buscar_pais(lista_paises):
+"""
+Funcion buscar_pais, no recibe parametro
+Solicita al usuario que ingrese un nombre y busca los paises que coincidan con el nombre ingresado.
+"""
+def buscar_pais():
     busqueda=[]
     
     seek=validar_nombre("¿Que país estas buscando?: ")
     limpiar_pantalla()
 
     for pais in paises_lista:
-            nombre_pais = pais["nombre"].title()#cambie lower por capitalize()
+            nombre_pais = pais["nombre"].title()
 
             if nombre_pais.startswith(seek):
                 busqueda.append([pais["nombre"],pais["población"],pais["superficie"],pais["continente"]])
@@ -356,7 +374,10 @@ def buscar_pais(): #modifique acá ya que no tiene que recibir parametros, antes
     limpiar_pantalla()
     confirm=""
 
-
+"""
+Funcion validar_opcion, recibe como parametro una lista y un mensaje
+En esta funcion se valida que los valores ingresados por el usuario sean correctos y se encuentren dentro del rango permitido.
+"""
 
 def validar_opcion(lista,mensaje):
     while True:
@@ -373,7 +394,10 @@ def validar_opcion(lista,mensaje):
             print("╚" + "═" * 70 + "╝")
     
 
-
+"""
+Funcion seleccion_criterio_ordenamiento, no recibe parametro
+Solicita al usuario que ingrese un criterio de ordenamiento y retorna el valor correspondiente.
+"""
 def seleccion_criterio_ordenamiento():
     while True:
         print("╔"+"═" *70+"╗")
@@ -398,7 +422,10 @@ def seleccion_criterio_ordenamiento():
                 return criterio
 
 
-
+"""
+Funcion elección_orden, no recibe parametro
+Solicita al usuario que ingrese una opcion de orden, valida la opcion y retorna el valor correspondiente.
+"""
 def elección_orden():
     limpiar_pantalla()
     while True:
@@ -418,7 +445,10 @@ def elección_orden():
                 Descendente=True
                 return Descendente
 
-
+"""
+Funcion ordenamiento, no recibe parametro
+Selecciona el criterio de ordenamiento y el orden de la lista.
+"""
 def ordenamiento():
     global paises_lista
     Criterio=seleccion_criterio_ordenamiento()
@@ -426,7 +456,10 @@ def ordenamiento():
     lista_Ordenada=sorted(paises_lista, key=lambda x: x[Criterio], reverse=Orden)
     mostrar_lista_ordenada(lista_Ordenada,Criterio,Orden)
 
-
+"""
+Funcion mostrar_lista_ordenada, recibe como parametro una lista y el criterio de ordenamiento.
+Muestra la lista en pantalla
+"""
 def mostrar_lista_ordenada(lista, criterio, Orden):
     limpiar_pantalla()
     if Orden== False :
@@ -446,7 +479,10 @@ def mostrar_lista_ordenada(lista, criterio, Orden):
     confirm=input("")
     limpiar_pantalla()
 
-
+"""
+Funcion filtro_paises, no recibe parametro
+Solicita al usuario que ingrese una opcion de filtrado y llama a la funcion correspondiente.
+"""
 def filtrar_paises():
     limpiar_pantalla()
     print("╔" + "═" * 70 + "╗")
@@ -469,7 +505,10 @@ def filtrar_paises():
             return 
 
 
-
+"""
+Funcion filtro_continentes, no recibe parametro
+Solicita al usuario que ingrese un continente y filtra los paises que se encuentran en ese continente.
+"""
 def filtro_continentes():
     filtrados=[]
     limpiar_pantalla()
@@ -480,7 +519,10 @@ def filtro_continentes():
     listar_pais(filtrados)
 
 
-
+"""
+Funcion validar_rango, recibe como parametro un mensaje para pedir el valor, la clave del diccionario y el tipo de dato
+En esta funcion se valida que los valores ingresados por el usuario sean correctos y se encuentren dentro del rango permitido.
+"""
 def validar_rango(mensaje_1,clave,conjunto_numerico):
    
     while True:
@@ -496,12 +538,15 @@ def validar_rango(mensaje_1,clave,conjunto_numerico):
             print("╔" + "═" * 80 + "╗")
             print(f"║{f'ERROR: {e}':^79} ║")
             print("╚" + "═" * 80 + "╝")
-            #le agre tu formato de menú bro
 
 
 
 
 
+"""
+Funcion filtro_rango, recibe como parametro un mensaje para pedir el valor, la clave del diccionario y el tipo de dato
+Recorre la lista de paises y filtra los que se encuentran dentro del rango de valores dados por el usuario
+"""
 
 def filtro_rango(mensaje_1,clave,conjunto_numerico):
     filtrados_rango=[]
@@ -511,6 +556,15 @@ def filtro_rango(mensaje_1,clave,conjunto_numerico):
             filtrados_rango.append(pais)
     listar_pais(filtrados_rango)
     
+
+
+"""
+Funcion estadistica, no recibe parametro
+recorre los diccionarios con funciones anonimas para obtener los valores de promedio, maximos y minimos
+tambien cuenta con un bucle para contar la cantidad de paises por continente y mostrarlo en pantalla
+se podia hacer todo en una linea pero se volvia algo complejo de entender quizas.
+"""
+
 
 def estadistica():
     continentes=["Europa","América","África","Asia","Oceanía","Antártida"]

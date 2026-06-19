@@ -2,8 +2,7 @@
 import csv
 import os
 import Funciones_de_prueba as fun
-#ruta_archivo="Paises_data.csv"<-BROOO: lo saco porque declare la ruta completa en el módulo de funciones
-#paises=fun.cargar_datos()#BROO por eso acá le saqué el parámtero y tambien la llamo sin igualar a nada
+
 fun.cargar_datos()
 
 try:
@@ -30,10 +29,10 @@ try:
                 fun.buscar_pais()
             case '4':
                 fun.limpiar_pantalla()
-                fun.ordenamiento() #BROO esta opción tenes que agregarla al menú
+                fun.ordenamiento()
             case '5':
                 fun.limpiar_pantalla()
-                fun.filtrar_paises()#BROO esta opción tambien hay que agregarla al menú
+                fun.filtrar_paises()
             case '6':
                 fun.limpiar_pantalla()
                 fun.estadistica()
