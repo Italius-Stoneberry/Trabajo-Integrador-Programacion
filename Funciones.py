@@ -362,7 +362,7 @@ def buscar_pais():
     else:
         print("╠"+"═" *16+"╬"+"═" *18+"╬"+"═" *17+"╬"+"═" *16+"╣")
         for i in range(len(busqueda)):
-            print(f"║{busqueda[i][0].title():^16}║{busqueda[i][1]:^18}║{busqueda[i][2]:^17}║{busqueda[i][3].title():^16}║")
+            print(f"║{busqueda[i][0][:15].title():^16}║{busqueda[i][1]:^18}║{busqueda[i][2]:^17}║{busqueda[i][3].title():^16}║")
         print("╠"+"═" *16+"╩"+"═" *18+"╩"+"═" *17+"╩"+"═" *16+"╣")
 
         
@@ -470,7 +470,7 @@ def mostrar_lista_ordenada(lista, criterio, Orden):
     print(f"║{'País':^15} ║ {'población':^15} ║ {'superficie':^15} ║ {'continente':^15} ║")
     print("╠"+"═" *16+"╬"+"═" *17+"╬"+"═" *17+"╬"+"═" *17+"╣")
     for pais in lista:
-     print(f"║{pais['nombre'].title():^15} ║ {pais['población']:^15} ║ {pais['superficie']:^15} ║ {pais['continente'].title():^15} ║")   
+     print(f"║{pais['nombre'][:15].title():^15} ║ {pais['población']:^15} ║ {pais['superficie']:^15} ║ {pais['continente'].title():^15} ║")   
     print("╠"+"═" *16+"╩"+"═" *17+"╩"+"═" *17+"╩"+"═" *17+"╣")
     print(f"║{'Presione ENTER para continuar':^69} ║")
     print("╚" + "═" * 70 + "╝")
@@ -578,8 +578,8 @@ def estadistica():
     promedio_superficie=sum(map(lambda x:x['superficie'], paises_lista))/len(paises_lista)
 
     
-    texto_mayor = f"País con mayor población: {pais_mayor['nombre']} con {pais_mayor['población']}"
-    texto_menor = f"País con menor población: {pais_menor['nombre']} con {pais_menor['población']}"
+    texto_mayor = f"País con mayor población: {pais_mayor['nombre'][:15].title()} con {pais_mayor['población']}"
+    texto_menor = f"País con menor población: {pais_menor['nombre'][:15].title()} con {pais_menor['población']}"
     texto_promedio_poblacion=f"El promedio de poblacion de todos los paises es de: {promedio_poblacion:.0f} personas"
     texto_promedio_superficie=f"El promedio de superficie de todos los paises es de: {promedio_superficie:.2f} km²"
     

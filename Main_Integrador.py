@@ -1,7 +1,7 @@
 
 import csv
 import os
-import Funciones_de_prueba as fun
+import Funciones as fun
 
 fun.cargar_datos()
 
