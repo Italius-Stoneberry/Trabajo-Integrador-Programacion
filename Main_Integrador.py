@@ -1,56 +1,49 @@
+
 import csv
 import os
-import Funciones_de_prueba
-ruta_archivo="Paises_data.csv"
-<<<<<<< Updated upstream
-Funciones_de_prueba.cargar_datos("Paises_data.csv")
+import Funciones as fun
 
+fun.cargar_datos()
 
-'''while True:
-=======
-paises=Funciones_.cargar_datos(ruta_archivo)
+try:
+ if fun.archivo_roto:
+    fun.limpiar_pantalla()
+    fun.mensaje_bloqueo_de_seguridad()
+    input("\nPresione ENTER para salir...")
+ else:
+    while True:
+        fun.mostrar_menu()
+        opcion = input("Elija una opción: ")
 
-
-print("Ingresar datos:")
-while True:
->>>>>>> Stashed changes
-    Pais_Nombre=Funciones_.validar_Nombre("Ingrese el nombre del pais: ")
-    Existencia=Funciones_.validar_existencia(Pais_Nombre,paises)
-    if Existencia:
-        print("Nombre guardado correctamente")
-    else:
-        print("Este país ya existe en el archivo. Intente con otro.")
-        break
-    Poblacion=Funciones_.validar_numero("Ingrese el número de población: ", "Población", int)
-    Superficie=Funciones_.validar_numero("Ingrese el número de superfície en km^2: ","Superfície", float)
-    Continente=Funciones_.validar_Nombre("Ingrese el nombre del Continente al que el país pertenece: ")
-    pais_diccionario={
-        "País": Pais_Nombre,
-        "Población":Poblacion,
-        "Superfície":Superficie,
-        "Continente":Continente
-    }
-    paises.append(pais_diccionario)'''
-#Estoy simulando un main, lo que estar arriab entre las comillas comentado, podés borrarlo
-while True:
-    print("\n--- MENÚ DE GESTIÓN DE PAÍSES ---")
-    print("1. Agregar País")
-    print("2. Salir")
     
-    opcion = input("Elija una opción: ")
-    
-    if opcion == "1":
-        Funciones_de_prueba.agregar_paises() # No le pasamos nada, ella ya sabe qué hacer
-    elif opcion == "2":
-        print("Saliendo...")
-        break
-    else:
-        print("Opción inválida.")
-if  Funciones_de_prueba.guardar_cambios():
-        print("Los datos se guardaron con éxito")
-else:
-        print("Los datos no se guardaron, debido al error al momento de cargar")
-<<<<<<< Updated upstream
-=======
-    break
->>>>>>> Stashed changes
+        match(opcion):
+            case '1':
+                fun.limpiar_pantalla()
+                fun.agregar_paises()
+            
+            case '2':
+                fun.limpiar_pantalla()
+                fun.listar_pais()            
+            case '3':
+                fun.limpiar_pantalla()
+                fun.buscar_pais()
+            case '4':
+                fun.limpiar_pantalla()
+                fun.ordenamiento()
+            case '5':
+                fun.limpiar_pantalla()
+                fun.filtrar_paises()
+            case '6':
+                fun.limpiar_pantalla()
+                fun.estadistica()
+            case '7':
+                break   
+            case _:
+                fun.limpiar_pantalla()
+                print("Opción inválida.")
+except KeyboardInterrupt:
+    fun.limpiar_pantalla()
+    print("\n╔" + "═" * 70 + "╗")
+    print(f"║{' FORZANDO CIERRE DEL PROGRAMA ':^70}║")
+    print(f"║{' Gracias por su tiempo, vuelva pronto. ':^70}║")
+    print("╚" + "═" * 70 + "╝")

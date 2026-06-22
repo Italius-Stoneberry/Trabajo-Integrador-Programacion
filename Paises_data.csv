@@ -1,8 +1,32 @@
-﻿País;Población;Superfície;Continente
-<<<<<<< Updated upstream
-Argentina;45376763;2780400;América
-Japon;125800000;377975;Europa
+﻿nombre;población;superficie;continente
+Argentina;46044703;2780400.0;América
+Japón;125800000;377975.0;Asia
+Brasil;213993437;8515767.0;América
+Alemania;83149300;357022.0;Europa
+China;1444216107;9596961.0;Asia
+Jordania;11200000;92300.0;Asia
+Italia;58784488;301340.0;Europa
+Canadá;38267090;9984670.0;América
+Nigeria;218541212;923768.0;África
+Nueva Zelanda;5020300;268021.0;Oceanía
+México;128932753;1972550.0;América
+India;1393409038;3287263.0;Asia
+España;47351567;505990.0;Europa
+Egipto;104258327;1002450.0;África
+Polonia;37846611;312685.0;Europa
+Portugal;10295909;92212.0;Europa
+Finlandia;5540720;338424.0;Europa
+Perú;33358931;1285216.0;América
+Chile;19116209;756102.0;América
+Bolivia;11833902;1098581.0;América
+Estonia;1326535;45227.0;Europa
+Lituania;2882382;65300.0;Europa
+Reino Unido;67215293;242495.0;Europa
+Noruega;5379475;385207.0;Europa
+Suecia;10353442;450295.0;Europa
 Bolivia;1232331;12324565432.0;Europa
-Brasil;123454321;12342123456432.0;América
-=======
->>>>>>> Stashed changes
+Rusia;90000000;154000.0;Asia
+Grecia;11000000;131957.0;Europa
+Vaticano;0;0.0;Europa
+República Democrática Del Congo;114856643;2344858.0;África
+
